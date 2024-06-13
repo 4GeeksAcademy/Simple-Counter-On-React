@@ -2,14 +2,11 @@ import React, { useEffect, useState } from "react";
 import DigitCard from "./digit_card.jsx";
 import ControlPanel from "./ControlPanel.jsx";
 
-// Create your first component
 const Home = () => {
-  const [counter, setCounter] = useState(0); // Start the counter at 0
+  const [counter, setCounter] = useState(300); // Start the counter at 0
   const [isPaused, setIsPaused] = useState(false);
-  const [resumeLabel, setResumeLabel] = useState("fa-solid fa-pause") // State variable to control pause/resume
-
-  // const [iconClass, setIconClass] = useState("fa-solid fa-pause");
-  const [resumeVisible, setResumeVisible] = useState(false); // New state for Resume button visibility
+  const [resumeLabel, setResumeLabel] = useState("fa-solid fa-pause"); // State variable to control pause/resume icon
+  const [mode, setMode] = useState("simple"); // State variable to control counter mode
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -19,45 +16,54 @@ const Home = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [isPaused]); // Dependency array includes isPaused
+  }, [isPaused]);
 
-  const onPause = () => {
-    const togglePlayOrPause = isPaused === false ? true : false;
-    setIsPaused(togglePlayOrPause); // Pause the counter
-    setResumeVisible(true); // Show resume button when counter is Paused
-    const  togglePlayPauseIcon = resumeLabel === "fa-solid fa-pause" ? "fa-solid fa-play" : "fa-solid fa-pause";
-    setResumeLabel(togglePlayPauseIcon)
+  const playPause = () => {
+    setIsPaused(!isPaused); // Toggle pause/resume state
+    const togglePlayPauseIcon = resumeLabel === "fa-solid fa-pause" ? "fa-solid fa-play" : "fa-solid fa-pause";
+    setResumeLabel(togglePlayPauseIcon);
   };
-
-  // const onResume = () => {
-  //   setIsPaused(false);
-  
-  //   setResumeLabel("fa-solid fa-pause");// Resume the counter
-  //   setResumeVisible(false);  //hide resume button when resuming
-  // };
 
   const onStop = () => {
     setIsPaused(true); // Stop the counter
-    setCounter(0); 
-    setResumeLabel("fa-solid fa-play");// Reset the counter
-    setResumeVisible(true); 
+    setCounter(0);
+    setResumeLabel("fa-solid fa-play"); // Reset the counter
   };
 
+  const toggleMode = () => {
+    setMode((prevMode) => (prevMode === "simple" ? "time" : "simple"));
+  };
 
-  // Pad the counter string to always show 6 digits
-  const counterString = String(counter).padStart(6, '0');
-  const digits = counterString.split('');
+  const formatTime = (seconds) => {
+    const hrs = Math.floor(seconds / 3600).toString().padStart(2, '0');
+    const mins = Math.floor((seconds % 3600) / 60).toString().padStart(2, '0');
+    const secs = (seconds % 60).toString().padStart(2, '0');
+    return `${hrs}:${mins}:${secs}`;
+  };
+
+  let digits, labels;
+  if (mode === "simple") {
+    const counterString = String(counter).padStart(6, '0');
+    digits = counterString.split('');
+    labels = [];
+  } else {
+    const [hrs, mins, secs] = formatTime(counter).split(':');
+    digits = [...hrs, ...mins, ...secs];
+    labels = ['Hours', 'Hours', 'Minutes', 'Minutes', 'Seconds', 'Seconds'];
+  }
 
   return (
     <div style={containerStyle}>
       <div style={counterStyle}>
         <DigitCard key="clock" digit={<i className="fa-solid fa-stopwatch"></i>} />
         {digits.map((digit, index) => (
-          <DigitCard key={index} digit={digit} />
+          <div key={index} style={digitContainerStyle}>
+            <DigitCard digit={digit} />
+            {mode === "time" && <div style={labelStyle}>{labels[index]}</div>}
+          </div>
         ))}
       </div>
-      <ControlPanel onPause={onPause} onStop={onStop} resumeVisible={resumeVisible} resumeLabel={resumeLabel} />
-      {/* onPause={() => setIsPaused(true)} */}
+      <ControlPanel playPause={playPause} onStop={onStop} resumeLabel={resumeLabel} toggleMode={toggleMode} />
     </div>
   );
 };
@@ -76,6 +82,19 @@ const counterStyle = {
   justifyContent: 'center',
   alignItems: 'center',
   marginBottom: '20px',
+};
+
+const digitContainerStyle = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  margin: '0 5px'
+};
+
+const labelStyle = {
+  marginTop: '5px',
+  color: '#fff',
+  fontSize: '0.8rem'
 };
 
 export default Home;

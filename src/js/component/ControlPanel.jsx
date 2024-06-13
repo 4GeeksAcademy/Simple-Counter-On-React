@@ -1,10 +1,17 @@
 import React from "react";
 
-const ControlPanel = ({ onPause, onResume, onStop, resumeVisible, resumeLabel}) => {
+const ControlPanel = ({ playPause, onStop, resumeLabel, toggleMode }) => {
   return (
     <div id="control-panel" style={controlPanelStyle}>
-      <button onClick={onPause} className="btn btn-dark" style={buttonStyle}><i class={resumeLabel}></i></button>
-      <button onClick={onStop} className="btn btn-dark" style={buttonStyle}><i class="fa-solid fa-stop"></i></button>
+      <button onClick={playPause} className="btn btn-dark" style={buttonStyle}>
+        <i className={resumeLabel}></i>
+      </button>
+      <button onClick={onStop} className="btn btn-dark" style={buttonStyle}>
+        <i className="fa-solid fa-stop"></i>
+      </button>
+      <button onClick={toggleMode} className="btn btn-dark" style={buttonStyle}>
+        Toggle Mode
+      </button>
     </div>
   );
 };
@@ -17,13 +24,13 @@ const controlPanelStyle = {
 };
 
 const buttonStyle = {
-  padding: '10px 20px', // Increase padding for bigger buttons
-  fontSize: '1.2rem', // Increase font size
-  backgroundColor: '#ffa500', // Choose a color that complements #222 (e.g., orange)
-  color: '#fff', // Text color
-  borderRadius: '8px', // Add border radius for rounded corners
-  border: 'none', // Remove default button border
-  cursor: 'pointer', // Change cursor on hover
+  padding: '10px 20px',
+  fontSize: '1.2rem',
+  backgroundColor: '#ffa500',
+  color: '#fff',
+  borderRadius: '8px',
+  border: 'none',
+  cursor: 'pointer',
 };
 
 export default ControlPanel;
